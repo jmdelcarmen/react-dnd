@@ -178,11 +178,17 @@ export default function decorateHandler({
     }
 
     render() {
-      return React.createElement(DecoratedComponent, {
-        ...this.props,
-        ...this.state,
-        ref: isClassComponent(DecoratedComponent) ? this.handleChildRef : null,
-      });
+      if (isClassComponent(DecoratedComponent)) {
+        return React.createElement(DecoratedComponent, {
+          ...this.props,
+          ...this.state,
+          ref: isClassComponent(DecoratedComponent) ? this.handleChildRef : null,
+        });
+      } else {
+        return React.createElement(DecoratedComponent, {
+          ...this.props,
+        });
+      }
     }
   }
 
