@@ -7,6 +7,11 @@ import hoistStatics from 'hoist-non-react-statics';
 import shallowEqual from './utils/shallowEqual';
 import shallowEqualScalar from './utils/shallowEqualScalar';
 
+const isClassComponent = Comp =>
+  Boolean(
+    Comp && Comp.prototype && typeof Comp.prototype.render === 'function',
+  );
+
 export default function decorateHandler({
   DecoratedComponent,
   createHandler,
@@ -43,7 +48,7 @@ export default function decorateHandler({
 
     shouldComponentUpdate(nextProps, nextState) {
       return !arePropsEqual(nextProps, this.props) ||
-             !shallowEqual(nextState, this.state);
+        !shallowEqual(nextState, this.state);
     }
 
     constructor(props, context) {
@@ -107,10 +112,10 @@ export default function decorateHandler({
         handlerId,
         unregister,
       } = registerHandler(
-        type,
-        this.handler,
-        this.manager,
-      );
+          type,
+          this.handler,
+          this.manager,
+        );
 
       this.handlerId = handlerId;
       this.handlerMonitor.receiveHandlerId(handlerId);
@@ -173,13 +178,11 @@ export default function decorateHandler({
     }
 
     render() {
-      return (
-        <DecoratedComponent
-          {...this.props}
-          {...this.state}
-          ref={this.handleChildRef}
-        />
-      );
+      return React.createElement(DecoratedComponent, {
+        ...this.props,
+        ...this.state,
+        ref: isClassComponent(DecoratedComponent) ? this.handleChildRef : null,
+      });
     }
   }
 
